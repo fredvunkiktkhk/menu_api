@@ -44,7 +44,6 @@ class ItemModal extends Component {
 
     // Add item via addItem action
     this.props.addItem(newItem);
-
     // Close modal
     this.toggle();
   };
@@ -81,8 +80,8 @@ class ItemModal extends Component {
                 <Label for='price'>Hind</Label>
                 <Input
                   type='text'
-                  name='name'
-                  id='item'
+                  name='price'
+                  id='price'
                   placeholder='Lisa hind'
                   onChange={this.onChange}
                 />

@@ -19,11 +19,48 @@ router.get('/', (req, res) => {
 // @access  Private
 router.post('/', auth, (req, res) => {
   const newFood = new Food({
-    name: req.body.name
+    name: req.body.name,
+    price: req.body.price
   });
 
   newFood.save().then(food => res.json(food));
 });
+
+// @route   PUT api/items/:id
+// @desc    Edit A Item
+// @access  Private
+router.put("/:id", auth, (req, res) => {
+  Food.findByIdAndUpdate({ _id: req.params.id }, req.body)
+      .then(food => {
+food.name = req.body.name;
+food.price = req.body.price;
+          food.updateOne(req.body).then(() => res.json({ message: "Food updated" }))
+      })
+      .catch(err => res.status(400).json({ message: "Something went wrong" }));
+});
+
+// router.put('/:id', auth).post((req, res) => {
+//   Food.findById(req.params.id)
+//       .then(food => {
+//         food.name = req.body.name;
+//         food.price = req.body.price;
+//
+//         food.save()
+//             .then(() => res.json('Okay'))
+//             .catch(err => res.status(400).json('Error: ' + err));
+//       })
+//       .catch(err => res.status(400).json('Error: ' + err));
+// });
+
+// router.put("/:id", auth, (req, res) => {
+//   Food.findByIdAndUpdate({ _id: req.params.id }, req.body)
+//       .then(food => {
+// food.name = req.body.name;
+// food.price = req.body.price;
+//           food.updateOne(req.body).then(() => res.json({ message: "Food updated" }))
+//       })
+//       .catch(err => res.status(400).json({ message: "Something went wrong" }));
+// });
 
 // @route   DELETE api/items/:id
 // @desc    Delete A Item
@@ -34,12 +71,6 @@ router.delete('/:id', auth, (req, res) => {
     .catch(err => res.status(404).json({ success: false }));
 });
 
-router.put("/:id", auth, (req, res) => {
-  Food.findByIdAndUpdate({ _id: req.params.id }, req.body)
-      .then(food =>
-          food.updateOne().then(() => res.json({ message: "Food updated" }))
-      )
-      .catch(err => res.status(400).json({ message: "Something went wrong" }));
-});
+
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_ITEMS, ADD_ITEM, DELETE_ITEM, ITEMS_LOADING } from './types';
+import { GET_ITEMS, ADD_ITEM, EDIT_ITEM, DELETE_ITEM, ITEMS_LOADING } from './types';
 import { tokenConfig } from './authActions';
 import { returnErrors } from './errorActions';
 
@@ -30,6 +30,20 @@ export const addItem = item => (dispatch, getState) => {
     .catch(err =>
       dispatch(returnErrors(err.response.data, err.response.status))
     );
+};
+
+export const editItem = id => (dispatch, getState) => {
+    axios
+        .put(`/api/foods/${id}`, tokenConfig(getState))
+        .then(res =>
+            dispatch({
+                type: EDIT_ITEM,
+                payload: id
+            })
+        )
+        .catch(err =>
+            dispatch(returnErrors(err.response.data, err.response.status))
+        );
 };
 
 export const deleteItem = id => (dispatch, getState) => {
