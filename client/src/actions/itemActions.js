@@ -33,14 +33,18 @@ export const addItem = item => (dispatch, getState) => {
 };
 
 export const editItem = id => (dispatch, getState) => {
+    let { name, price } = this.state.editFoodData;
     axios
-        .put(`/api/foods/${id}`, tokenConfig(getState))
+        .put(`/api/foods/` + this.state.editFoodData.id, tokenConfig(getState), {
+            name, price,
+        })
         .then(res =>
-            dispatch({
-                type: EDIT_ITEM,
-                payload: id
+            {
+                this._refreshFood();
+                this.setState({
+                    editFoodModal: false, editFoodData: { id: '', name: '', price: ''}
+                })
             })
-        )
         .catch(err =>
             dispatch(returnErrors(err.response.data, err.response.status))
         );

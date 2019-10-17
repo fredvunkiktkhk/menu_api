@@ -7,6 +7,7 @@ import {
   Button,
   ModalHeader,
   ModalBody,
+    ModalFooter,
   Form,
   FormGroup,
   Label,
@@ -14,7 +15,9 @@ import {
 } from 'reactstrap';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { connect } from 'react-redux';
+import { tokenConfig } from '../actions/authActions';
 import { editItem, getItems, deleteItem } from '../actions/itemActions';
+import axios from 'axios';
 import PropTypes from 'prop-types';
 
 class ShoppingList extends Component {
@@ -26,20 +29,20 @@ class ShoppingList extends Component {
   };
 
   state = {
-    modal: false,
-    name: '',
-    price: ''
+    items: [],
+    editFoodData: {
+      id: '',
+      name: '',
+      price: ''
+    },
+  editFoodModal: false
   };
 
-  toggle = () => {
+  toggleEditFoodModal() {
     this.setState({
-      modal: !this.state.modal
+      editFoodModal: ! this.state.editFoodModal
     });
-  };
-
-  onChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+  }
 
   componentDidMount() {
     this.props.getItems();
@@ -48,21 +51,35 @@ class ShoppingList extends Component {
     this.props.deleteItem(id);
   };
 
-  onSubmit = e => {
-    e.preventDefault();
-// () =>  onSubmit(_id) tuleb lisada
-    const newItem = {
-      name: this.state.name,
-      price: this.state.price
-    };
+  updateFood() {
+    let { name, price } = this.state.editFoodData;
+    const token = localStorage.getItem('token');
+    console.log(token)
+    axios.put('http://localhost:5000/api/foods' + this.state.editFoodData.id, {
 
-    // Add item via addItem action
-    this.props.editItem(newItem);
-console.log(newItem);
-    // Close modal
-    this.toggle();
-  };
+      name, price,
+    }).then((response) => {
+      console.log("response: " + JSON.stringify(response));
+      this._refreshFood();
+      this.setState({
+        editFoodModal: false, editFoodData: { id: '', name: '', price: '' }
+    })
+    });
+  }
 
+editFood(id, name, price) {
+    this.setState({
+      editFoodData: { id, name, price }, editFoodModal: ! this.state.editFoodModal
+    });
+  }
+
+_refreshFood(){
+  axios.get('http://localhost:5000/api/foods').then((response) => {
+    this.setState({
+      items: response.data
+    })
+  });
+}
 
   render() {
     const { items } = this.props.item;
@@ -78,49 +95,46 @@ console.log(newItem);
                       className='remove-btn'
                       color='danger'
                       size='sm'
-                      onClick={this.onDeleteClick.bind(this, _id)}
-                    >
+                      onClick={this.onDeleteClick.bind(this, _id)}>
                       &times;
                     </Button>
-
                   ) : null}
-
                   {name}
-                  <p style={{float: 'right'}}>{price}€</p>
-
                   {this.props.isAuthenticated ? (
-                      <Button onClick={this.toggle}>
-                        Muuda
-                      </Button>
+                      <Button style={{float: 'right'}} onClick={this.editFood.bind(this, _id, name, price)}>Muuda</Button>
                   ) : null}
-                  <Modal isOpen={this.state.modal} toggle={this.toggle}>
-                    <ModalHeader toggle={this.toggle}>Uuenda toitu</ModalHeader>
-                    <ModalBody>
-                      <Form onSubmit={this.onSubmit}>
-                        <FormGroup>
-                          <Label for='item'>Toit</Label>
-                          <Input
-                              type='text'
-                              name='name'
-                              id='item'
-                              placeholder='Lisa toit'
-                              onChange={this.onChange}
-                          />
+                  <p style={{float: 'right', marginRight: '5px'}}>{price}€</p>
 
-                          <Label for='price'>Hind</Label>
-                          <Input
-                              type='text'
-                              name='price'
-                              id='price'
-                              placeholder='Lisa hind'
-                              onChange={this.onChange}
-                          />
-                          <Button color='dark' style={{ marginTop: '2rem' }} block>
-                            Uuenda
-                          </Button>
-                        </FormGroup>
-                      </Form>
+
+                  <Modal isOpen={this.state.editFoodModal} toggle={this.toggleEditFoodModal.bind(this)}>
+                    <ModalHeader toggle={this.toggleEditFoodModal.bind(this)}>Muuda toitu</ModalHeader>
+                    <ModalBody>
+                      <FormGroup>
+                        <Label for="title">Name</Label>
+                        <Input id="item" value={this.state.editFoodData.name} onChange={(e) => {
+                          let { editFoodData } = this.state;
+
+                          editFoodData.name = e.target.value;
+
+                          this.setState({ editFoodData });
+                        }} />
+                      </FormGroup>
+                      <FormGroup>
+                        <Label for="rating">Price</Label>
+                        <Input id="item" value={this.state.editFoodData.price} onChange={(e) => {
+                          let { editFoodData } = this.state;
+
+                          editFoodData.price= e.target.value;
+
+                          this.setState({ editFoodData });
+                        }} />
+                      </FormGroup>
+
                     </ModalBody>
+                    <ModalFooter>
+                      <Button color="primary" onClick={this.updateFood.bind(this)}>Uuenda toitu</Button>{' '}
+                      <Button color="secondary" onClick={this.toggleEditFoodModal.bind(this)}>X</Button>
+                    </ModalFooter>
                   </Modal>
                 </ListGroupItem>
               </CSSTransition>
@@ -133,6 +147,7 @@ console.log(newItem);
 }
 
 const mapStateToProps = state => ({
+    items: state,
   item: state.item,
   isAuthenticated: state.auth.isAuthenticated
 });

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const config = require('config');
+const cors = require('cors');
 
 const app = express();
 
@@ -20,6 +21,8 @@ mongoose
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 
+
+app.use(cors());
 // Use Routes
 app.use('/api/foods', require('./routes/api/foods'));
 app.use('/api/users', require('./routes/api/users'));
