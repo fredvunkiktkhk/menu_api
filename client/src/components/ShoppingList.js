@@ -7,7 +7,7 @@ import {
   Button,
   ModalHeader,
   ModalBody,
-    ModalFooter,
+  ModalFooter,
   Form,
   FormGroup,
   Label,
@@ -35,12 +35,12 @@ class ShoppingList extends Component {
       name: '',
       price: ''
     },
-  editFoodModal: false
+    editFoodModal: false
   };
 
   toggleEditFoodModal() {
     this.setState({
-      editFoodModal: ! this.state.editFoodModal
+      editFoodModal: !this.state.editFoodModal
     });
   }
 
@@ -54,32 +54,34 @@ class ShoppingList extends Component {
   updateFood() {
     let { name, price } = this.state.editFoodData;
     const token = localStorage.getItem('token');
-    console.log(token)
-    axios.put('http://localhost:5000/api/foods' + this.state.editFoodData.id, {
-
-      name, price,
+    axios.put('http://localhost:5000/api/foods/' + this.state.editFoodData.id, {
+      name, price
+    }, {
+      headers: {
+        'x-auth-token': token
+      }
     }).then((response) => {
-      console.log("response: " + JSON.stringify(response));
+      console.log(response);
       this._refreshFood();
       this.setState({
         editFoodModal: false, editFoodData: { id: '', name: '', price: '' }
-    })
+      })
     });
   }
 
-editFood(id, name, price) {
+  editFood(id, name, price) {
     this.setState({
-      editFoodData: { id, name, price }, editFoodModal: ! this.state.editFoodModal
+      editFoodData: { id, name, price }, editFoodModal: !this.state.editFoodModal
     });
   }
 
-_refreshFood(){
-  axios.get('http://localhost:5000/api/foods').then((response) => {
-    this.setState({
-      items: response.data
-    })
-  });
-}
+  _refreshFood() {
+    axios.get('http://localhost:5000/api/foods').then((response) => {
+      this.setState({
+        items: response.data
+      })
+    });
+  }
 
   render() {
     const { items } = this.props.item;
@@ -101,9 +103,9 @@ _refreshFood(){
                   ) : null}
                   {name}
                   {this.props.isAuthenticated ? (
-                      <Button style={{float: 'right'}} onClick={this.editFood.bind(this, _id, name, price)}>Muuda</Button>
+                    <Button style={{ float: 'right' }} onClick={this.editFood.bind(this, _id, name, price)}>Muuda</Button>
                   ) : null}
-                  <p style={{float: 'right', marginRight: '5px'}}>{price}€</p>
+                  <p style={{ float: 'right', marginRight: '5px' }}>{price}€</p>
 
 
                   <Modal isOpen={this.state.editFoodModal} toggle={this.toggleEditFoodModal.bind(this)}>
@@ -124,7 +126,7 @@ _refreshFood(){
                         <Input id="item" value={this.state.editFoodData.price} onChange={(e) => {
                           let { editFoodData } = this.state;
 
-                          editFoodData.price= e.target.value;
+                          editFoodData.price = e.target.value;
 
                           this.setState({ editFoodData });
                         }} />
@@ -147,7 +149,7 @@ _refreshFood(){
 }
 
 const mapStateToProps = state => ({
-    items: state,
+  items: state,
   item: state.item,
   isAuthenticated: state.auth.isAuthenticated
 });

@@ -26,7 +26,7 @@ export default function (state = initialState, action) {
                 items: state.items.filter(items => items._id !== action.payload)
             };
         case EDIT_ITEM:
-            return state.map((items) => items._id === action.id ? {...items, editing: !items.editing} : items);
+            return state.map((items) => items._id === action.id ? { ...items, editing: !items.editing } : items);
         case UPDATE:
             return state.map((items) => {
                 if (items._id === action.id) {

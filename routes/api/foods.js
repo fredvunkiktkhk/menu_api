@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
+const cors = require('cors');
+
 
 // Item Model
 const Food = require('../../models/Food');
@@ -29,14 +31,14 @@ router.post('/', auth, (req, res) => {
 // @route   PUT api/items/:id
 // @desc    Edit A Item
 // @access  Private
-router.put("/:id", auth, (req, res) => {
+router.put("/:id", auth, (req, res, next) => {
   Food.findByIdAndUpdate({ _id: req.params.id }, req.body)
-      .then(food => {
-food.name = req.body.name;
-food.price = req.body.price;
-          food.updateOne(req.body).then(() => res.json({ message: "Food updated" }))
-      })
-      .catch(err => res.status(400).json({ message: "Something went wrong" }));
+    .then(food => {
+      food.name = req.body.name;
+      food.price = req.body.price;
+      food.updateOne(req.body).then(() => res.json({ message: "Product Created" }))
+    })
+    .catch(err => res.status(400).json({ message: "Something went wrong" }));
 });
 
 // router.put('/:id', auth).post((req, res) => {

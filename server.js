@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const config = require('config');
-const cors = require('cors');
+// const cors = require('cors');
 
 const app = express();
 
@@ -10,11 +10,12 @@ const app = express();
 app.use(express.json());
 
 // DB Config
+mongoose.set('useFindAndModify', false);
 const db = config.get('mongoURI');
 
 // Connect to Mongo
 mongoose
-  .connect(db, { 
+  .connect(db, {
     useNewUrlParser: true,
     useCreateIndex: true
   }) // Adding new mongo url parser
@@ -22,11 +23,24 @@ mongoose
   .catch(err => console.log(err));
 
 
-app.use(cors());
+
+
 // Use Routes
 app.use('/api/foods', require('./routes/api/foods'));
 app.use('/api/users', require('./routes/api/users'));
-app.use('/api/auth', require('./routes/api/auth'));
+app.use('/api/login', require('./routes/api/login'));
+
+// app.use((req, res, next) => {
+//   res.header("Acess-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   if (req.method === 'OPTIONS') {
+//     res.header('Access-Control-Allow-Methods', 'PUT')
+//     return res.status(200).json({});
+//   }
+// });
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {
