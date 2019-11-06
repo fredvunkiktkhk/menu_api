@@ -1,6 +1,6 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import rootReducer from './reducers';
+import { createStore, applyMiddleware, compose } from "redux";
+import thunk from "redux-thunk";
+import rootReducer from "./reducers";
 
 const initialState = {};
 
@@ -12,5 +12,10 @@ const store = createStore(
   initialState,
   composeEnhancers(applyMiddleware(...middleWare))
 );
+
+store.subscribe(() => {
+  localStorage.setItem("reduxState", JSON.stringify(store.getState()));
+  console.log(store.getState());
+});
 
 export default store;
