@@ -46,6 +46,7 @@ class ShoppingList extends Component {
   componentDidMount() {
     this.props.getItems();
   }
+
   onDeleteClick = id => {
     this.props.deleteItem(id);
   };
